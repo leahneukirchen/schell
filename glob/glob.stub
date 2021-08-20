@@ -1,0 +1,25 @@
+; chibi-ffi glob.stub                              
+; cc -fPIC -shared glob.c -lchibi-scheme -o glob.so
+
+(c-system-include "fnmatch.h")
+(c-system-include "glob.h")
+
+(define-c-const int FNM_NOMATCH)
+(define-c int fnmatch (string string int))
+
+;; need to define accessor function because chibi-ffi doesn't
+;; support (array string) fields.
+(c-declare "static void glob_pathv(glob_t *g, char ***o) { *o = g->gl_pathv; }")
+
+(define-c-type glob_t
+;; leak?
+;  finalizer: globfree
+  predicate: glob?
+  (size_t gl_pathc glob-path-count)
+; ((array string) gl_pathv glob-path-values)
+  (size_t gl_offs glob-offs))
+
+(define-c int (%glob "glob") (string int (value NULL) (result (pointer glob_t))))
+
+(define-c void (glob-path-values "glob_pathv") ((pointer glob_t) (result reference array string null)))
+
