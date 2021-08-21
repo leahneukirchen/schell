@@ -39,7 +39,16 @@
 (define-syntax do1
   (syntax-rules ()
     ((_ form1 . rest)
-     (%let ((r form1)) (begin . rest) r))))
+     (let ((r form1)) (begin . rest) r))))
+
+;; clojure style let
+(define-syntax with
+  (syntax-rules ()
+    ((_ (x y) . rest)
+     (let ((x y)) . rest))
+    ((_ (x y . brest) . rest)
+     (let ((x y)) (with brest . rest)))
+     ))
 
 #|
 (define-syntax for
@@ -84,20 +93,9 @@
    (drop-right list 1))
 
 (def (chomp s)
-  (let* ((l (string-length s)))
+  (with (l (string-length s))
     (if (zero? l)
       s
       (substring s 0 (- l (if (= (string-ref s (- l 1)) #\newline)
                               1
                               0))))))
-
-;; clojure style let
-(define-syntax let
-  (syntax-rules ()
-    ((_ (x y) . rest)
-     (%let ((x y)) . rest))
-    ((_ (x y . brest) . rest)
-     (%let ((x y)) (let brest . rest)))
-    ((_ label bind . rest)
-     (%let label bind . rest))
-     ))

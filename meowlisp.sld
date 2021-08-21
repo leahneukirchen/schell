@@ -3,7 +3,6 @@
 (define-library (meowlisp)
   (import
    (rename (except (chibi) =)
-           (let %let)
            (if %if)
            (do %do)
            (equal? =)
@@ -71,6 +70,7 @@
    for
    do
    do1
+   with
    concat
    const
    butlast

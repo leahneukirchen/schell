@@ -11,7 +11,7 @@ WARNING: This code is very alpha, be careful using it!
 
 ```
 (cd "/tmp")
-(let (tmp (run/str (mktemp -p ".")))
+(with (tmp (run/str (mktemp -p ".")))
   (run (:pipe (date)
               (:epf (rev) (> ,tmp))))
   (puts (str "The time backwards is: " (run/str (cat ,tmp))))
@@ -34,7 +34,7 @@ meowlisp differs from Scheme in some significant ways:
 
 * `fn` is used instead of `lambda`.
 
-* `let` uses fewer parentheses:
+* `with` is like `let*` with fewer parentheses:
 
   ```
   (let (a 6 b 7)
