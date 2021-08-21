@@ -60,6 +60,7 @@
    const
    butlast
    chomp
+   range
 
    ;; schell
    pipe

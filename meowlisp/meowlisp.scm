@@ -99,3 +99,15 @@
       (substring s 0 (- l (if (= (string-ref s (- l 1)) #\newline)
                               1
                               0))))))
+
+(def (range x . o)
+  (with (start (if (pair? o) x 0)
+         stop (if (pair? o) (car o) x)
+         step (if (and (pair? o) (pair? (cdr o)))
+                  (cadr o)
+                  1)
+         cmp (if (> step 0) >= <=))
+     (let loop ((i start) (res '()))
+       (if (cmp i stop)
+           (reverse! res)
+           (loop (+ i step) (cons i res))))))

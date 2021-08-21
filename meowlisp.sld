@@ -75,5 +75,6 @@
    const
    butlast
    chomp
+   range
    )
   )
