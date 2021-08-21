@@ -76,5 +76,6 @@
    butlast
    chomp
    range
+   with-return
    )
   )

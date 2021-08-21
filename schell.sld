@@ -61,6 +61,7 @@
    butlast
    chomp
    range
+   with-return
 
    ;; schell
    pipe

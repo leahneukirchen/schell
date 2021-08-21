@@ -111,3 +111,9 @@
        (if (cmp i stop)
            (reverse! res)
            (loop (+ i step) (cons i res))))))
+
+(define-syntax with-return
+  (syntax-rules ()
+    ((_ return body ...)
+     ;; call/ec would be sufficient if chibi had it
+     (call-with-current-continuation (fn (return) body ...)))))
