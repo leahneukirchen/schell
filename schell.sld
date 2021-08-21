@@ -58,6 +58,7 @@
    concat
    const
    butlast
+   chomp
 
    ;; schell
    pipe

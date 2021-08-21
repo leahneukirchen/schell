@@ -12,8 +12,8 @@ WARNING: This code is very alpha, be careful using it!
 ```
 (cd "/tmp")
 (let (tmp (run/str (mktemp -p ".")))
-  (run/pipe ((date))
-            ((rev) (> ,tmp)))
+  (run (:pipe (date)
+              (:epf (rev) (> ,tmp))))
   (puts (str "The time backwards is: " (run/str (cat ,tmp))))
   (run (rm ,tmp)))
 ```
@@ -105,8 +105,6 @@ Libschell provides the basic primitives of a shell:
 * `(run ...)`
 
 * `(run/str ...)`
-
-* `(run/pipe ...)`
 
 * `(& ...)`
 
