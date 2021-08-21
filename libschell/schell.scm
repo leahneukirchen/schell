@@ -23,18 +23,17 @@
          pid (fork))
     (if (zero? pid)
         (do
-            (close (car p))
-            (dup2 (cadr p) 1)
-            (close (cadr p))
-            (apply exec-epf epf))
-        (close (cadr p))
-;??     (set-non-blocking! (car p))
-        (do1
-          (-> (car p)
-              open-input-file-descriptor
-              port->string
-              chomp)
-          (set-status! (wait pid))))))
+          (close (car p))
+          (dup2 (cadr p) 1)
+          (close (cadr p))
+          (apply exec-epf epf))
+      (close (cadr p))
+;;??  (set-non-blocking! (car p))
+      (do1 (-> (car p)
+               open-input-file-descriptor
+               port->string
+               chomp)
+        (set-status! (wait pid))))))
 
 (define-syntax run/str
   (syntax-rules ()
@@ -42,8 +41,8 @@
      (run/str1 (quasiquote args)))))
 
 (def (run/lines1 epf)
-   (-> (run/str1 epf)
-       (string-split #\newline)))
+  (-> (run/str1 epf)
+      (string-split #\newline)))
 
 (define-syntax run/lines
   (syntax-rules ()
@@ -54,8 +53,8 @@
   (if (pair? n)
       (if (< (car n) (length (command-line)))
           (list-ref (command-line) (car n))
-          #f)
-      (command-line)))
+        #f)
+    (command-line)))
 
 ;; XXX May be Linux-specific!
 (def (wexitstatus n)
@@ -70,17 +69,17 @@
                 (if (pair? r)
                     (case (car r)
                       ((>) (with (fd (open (->string (cadr r))
-                                          (+ open/write open/create open/truncate)))
+                                           (+ open/write open/create open/truncate)))
                              (dup2 fd 1)))
                       ((>>) (with (fd (open (->string (cadr r))
-                                           (+ open/write open/append)))
+                                            (+ open/write open/append)))
                               (dup2 fd 1)))
                       ((<) (with (fd (open (->string (cadr r))
-                                          (+ open/read open/create)))
+                                           (+ open/read open/create)))
                              (dup2 fd 0)))
                       (else (error "invalid redir"))
                       )
-                    (error "redir not a list")))
+                  (error "redir not a list")))
             redir)
   (execute (car pf) pf)
   (display "ERROR: couldn't execute: " (current-error-port))
@@ -92,7 +91,7 @@
   (with (pid (fork))
     (if (zero? pid)
         (apply exec-epf epf)
-        pid)))
+      pid)))
 
 (def (wait pid)
   (with (status (waitpid pid 0))
@@ -110,12 +109,13 @@
 
 (def (run-pipe! epfs)
   (def (pid? p)
-     (and (> p 0)
-          (< p 99999999999)))   ; hack
+    (and (> p 0)
+         (< p 99999999999)))   ; hack
   (when (null? epfs)
     (error "empty pipe not allowed"))
-  (if (null? (cdr epfs))
-    (run! (car epfs))
+  (with-return return
+    (when (null? (cdr epfs))
+      (return (run! (car epfs))))
     (with (i 0
            final (- (length epfs) 1)
            lp #f
@@ -134,13 +134,13 @@
                                  (set! lp p)
                                  (set! i (+ 1 i))
                                  pid))
-                             (with (pid (fork))
-                               (when (zero? pid)
-                                 (dup2 (car lp) 0)
-                                 (exec-epf2 epf))
-                               (close (car lp))
-                               (set! i (+ 1 i))
-                               pid)))
+                           (with (pid (fork))
+                             (when (zero? pid)
+                               (dup2 (car lp) 0)
+                               (exec-epf2 epf))
+                             (close (car lp))
+                             (set! i (+ 1 i))
+                             pid)))
                      epfs)
            status (make-list (length epfs) #f)
            )
@@ -162,7 +162,6 @@
 (def :epf ':epf)
 
 (def (run! pf)
-  (pp pf)
   (cond ((= (car pf) :pipe)
          (run-pipe! (cdr pf)))
 
@@ -214,4 +213,4 @@
   (with (r (change-directory dir))
     (if r
         #t
-        (error (integer->error-string (errno))))))
+      (error (integer->error-string (errno))))))
