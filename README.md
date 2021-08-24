@@ -37,7 +37,7 @@ meowlisp differs from Scheme in some significant ways:
 * `with` is like `let*` with fewer parentheses:
 
   ```
-  (let (a 6 b 7)
+  (with (a 6 b 7)
     (* a b))
   ```
 
